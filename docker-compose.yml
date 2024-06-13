@@ -1,0 +1,50 @@
+version: '3.9'
+
+services:
+  apache:
+    build:
+      context: .
+      dockerfile: Dockerfile.apache
+    container_name: apache
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./laravel-app:/var/www/html
+    networks:
+      - laravel-network
+    depends_on:
+      - mysql
+    command: >
+      sh -c "
+      composer install &&
+      npm install &&
+      npm run production &&
+      php artisan migrate --force &&
+      apache2-foreground
+      "
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: laravel
+      MYSQL_USER: laraveluser
+      MYSQL_PASSWORD: laravelpassword
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./my.cnf:/etc/mysql/conf.d/my.cnf
+    ports:
+      - "3306:3306"
+    expose:
+      - 3306
+    networks:
+      - laravel-network
+
+networks:
+  laravel-network:
+    name: laravel-network
+
+volumes:
+  mysql-data:

@@ -1,0 +1,49 @@
+FROM --platform=linux/arm64 php:8.2-apache
+
+RUN apt-get update && apt-get install -y \
+    nodejs \
+    npm \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update && apt-get install -y \
+    libzip-dev \
+    unzip \
+    && docker-php-ext-install zip
+
+RUN a2enmod rewrite
+
+RUN docker-php-ext-install pdo pdo_mysql
+
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+WORKDIR /var/www/html
+
+# Copy the entire Laravel application into the container
+COPY ./laravel-app /var/www/html
+
+# Ensure package.json, package-lock.json, and webpack.mix.js are copied
+COPY ./laravel-app/package.json /var/www/html/package.json
+COPY ./laravel-app/package-lock.json /var/www/html/package-lock.json
+COPY ./laravel-app/webpack.mix.js /var/www/html/webpack.mix.js
+
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+
+COPY ./000-default.conf /etc/apache2/sites-available/000-default.conf
+
+# Install PHP dependencies
+RUN composer install --optimize-autoloader --no-dev
+
+# Install npm dependencies
+RUN npm install
+
+# Build npm assets
+RUN npm run production
+
+# Run Laravel setup commands
+RUN php artisan key:generate
+RUN php artisan config:cache
+RUN php artisan route:cache
+RUN php artisan view:clear
+
+EXPOSE 80 443

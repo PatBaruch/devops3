@@ -1,0 +1,33 @@
+{
+    "name": "laravel-app",
+    "version": "1.0.0",
+    "description": "## Prerequisites",
+    "main": "index.js",
+    "directories": {
+        "test": "tests"
+    },
+    "scripts": {
+        "production": "mix --production",
+        "dev": "mix"
+    },
+    "dependencies": {
+        "axios": "^0.21.1",
+        "bootstrap": "^5.1.0",
+        "resolve-url-loader": "^5.0.0",
+        "sass": "^1.32.8",
+        "sass-loader": "^12.1.0"
+    },
+    "devDependencies": {
+        "@popperjs/core": "^2.11.6",
+        "@vitejs/plugin-vue": "^4.5.0",
+        "bootstrap": "^5.2.3",
+        "laravel-mix": "^6.0.19",
+        "sass": "^1.56.1",
+        "vue": "^3.2.37",
+        "vue-loader": "^17.4.2",
+        "vue-template-compiler": "^2.7.16"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC"
+}
